@@ -19,7 +19,7 @@ DB_PATH = os.path.join(BASE_DIR, "marketplace.db")
 
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, template_folder="docs")
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key")
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DB_PATH}"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
