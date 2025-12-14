@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PlayerHub Marketplace</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="brand">
+        <span>◆</span>
+        <a href="{{ url_for('index') }}" class="brand">PlayerHub Marketplace</a>
+      </div>
+      <nav class="nav-links">
+        <a class="btn" href="{{ url_for('index') }}">Головна</a>
+        {% if current_user.is_authenticated %}
+        <a class="btn" href="{{ url_for('create_listing') }}">Нове оголошення</a>
+        <a class="btn" href="{{ url_for('profile') }}">Профіль</a>
+        {% if current_user.role and (current_user.role.can_manage_all_listings or current_user.role.can_manage_roles) %}
+        <a class="btn" href="{{ url_for('admin_panel') }}">Адмін-панель</a>
+        {% endif %}
+        <a class="btn" href="{{ url_for('logout') }}">Вийти</a>
+        {% else %}
+        <a class="btn" href="{{ url_for('login') }}">Увійти</a>
+        <a class="btn" href="{{ url_for('register') }}">Реєстрація</a>
+        {% endif %}
+      </nav>
+    </header>
+    <main class="container">
+      {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+      {% for category, msg in messages %}
+      <div class="alert alert-{{ category }}">{{ msg }}</div>
+      {% endfor %}
+      {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+    <footer class="footer">
+      © {{ current_year }} PlayerHub Marketplace — створено для спільноти гравців.
+    </footer>
+  </body>
+</html>

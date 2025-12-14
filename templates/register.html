@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+  <h2>Реєстрація</h2>
+  <form method="post">
+    <div class="field">
+      <label>Логін</label>
+      <input type="text" name="username" placeholder="player123" required />
+    </div>
+    <div class="field">
+      <label>Пароль</label>
+      <input type="password" name="password" required />
+    </div>
+    <div class="field">
+      <label>NickName</label>
+      <input type="text" name="nickname" placeholder="NightHunter" required />
+    </div>
+    <div class="field">
+      <label>Discord</label>
+      <input type="text" name="discord" placeholder="user#0001" required />
+    </div>
+    <button class="btn btn-success" type="submit">Створити акаунт</button>
+  </form>
+</div>
+{% endblock %}

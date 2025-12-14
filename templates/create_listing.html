@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+  <h2>{% if editing %}Редагувати оголошення{% else %}Нове оголошення{% endif %}</h2>
+  <form method="post">
+    <div class="field">
+      <label>Назва предмета</label>
+      <input type="text" name="title" value="{{ listing.title if listing else '' }}" required />
+    </div>
+    <div class="field">
+      <label>Категорія</label>
+      <select name="category" required>
+        {% for cat in categories %}
+        <option value="{{ cat }}" {% if listing and listing.category==cat %}selected{% endif %}>{{ cat|capitalize }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label>Ціна/бюджет</label>
+      <input type="number" min="0" step="0.01" name="price" value="{{ listing.price if listing else '' }}" required />
+    </div>
+    <div class="field">
+      <label>Короткий опис</label>
+      <textarea name="description" rows="4" required>{{ listing.description if listing else '' }}</textarea>
+    </div>
+    <div class="field">
+      <label>Discord для зв'язку</label>
+      <input type="text" name="contact_discord" value="{{ listing.contact_discord if listing else current_user.discord }}" required />
+    </div>
+    <button class="btn btn-success" type="submit">Зберегти</button>
+  </form>
+</div>
+{% endblock %}
