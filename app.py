@@ -114,6 +114,7 @@ def load_user(user_id: str) -> Optional[User]:
 def ensure_defaults():
     db.create_all()
     seed_roles()
+    seed_admin_account()
 
 
 @app.context_processor
@@ -146,6 +147,40 @@ def seed_roles():
         ]
         db.session.add_all(default_roles)
         db.session.commit()
+
+
+def seed_admin_account():
+    """Provision a default administrator if the database is empty.
+
+    This ensures there is always at least one user who can access the admin
+    panel (`/admin`) and grant roles to others. The credentials can be
+    configured via environment variables for safer deployments.
+    """
+    if User.query.count() > 0:
+        return
+
+    admin_role = Role.query.filter_by(name="Адміністратор").first()
+    if not admin_role:
+        return
+
+    username = os.environ.get("ADMIN_USERNAME", "admin")
+    password = os.environ.get("ADMIN_PASSWORD", "admin123")
+    discord = os.environ.get("ADMIN_DISCORD", "admin#0000")
+
+    admin = User(
+        username=username,
+        nickname="Адмін",
+        discord=discord,
+        role=admin_role,
+    )
+    admin.set_password(password)
+    db.session.add(admin)
+    db.session.commit()
+    app.logger.info(
+        "Створено дефолтний адмін-акаунт: %s / %s (оновіть через ADMIN_* env)",
+        username,
+        password,
+    )
 
 
 def require_permission(listing: Listing) -> bool:
