@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card" style="margin-bottom:16px">
+  <h2>Адмін-панель</h2>
+  <p>Керуйте оголошеннями, користувачами та ролями спільноти.</p>
+</div>
+<div class="grid" style="grid-template-columns: 2fr 1fr;">
+  <div class="card">
+    <h3>Усі оголошення</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Назва</th>
+          <th>Автор</th>
+          <th>Категорія</th>
+          <th>Дата</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for listing in listings %}
+        <tr>
+          <td>{{ listing.title }}</td>
+          <td>{{ listing.owner.username }}</td>
+          <td>{{ listing.category }}</td>
+          <td>{{ listing.created_at.strftime('%d.%m.%Y') }}</td>
+          <td>
+            <form method="post" action="{{ url_for('admin_delete_listing', listing_id=listing.id) }}">
+              <button class="btn btn-danger" type="submit">Видалити</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5">Оголошень немає.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h3>Користувачі</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Логін</th>
+          <th>Роль</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td>{{ user.username }}</td>
+          <td>{{ user.role.name }}</td>
+          <td>
+            {% if current_user.role and current_user.role.can_manage_roles %}
+            <form method="post" action="{{ url_for('assign_role', user_id=user.id) }}">
+              <select name="role_id">
+                {% for role in roles %}
+                <option value="{{ role.id }}" {% if role.id == user.role.id %}selected{% endif %}>{{ role.name }}</option>
+                {% endfor %}
+              </select>
+              <button class="btn" type="submit">Зберегти</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if current_user.role and current_user.role.can_manage_roles %}
+    <h4 style="margin-top:20px">Створити нову роль</h4>
+    <form method="post" action="{{ url_for('create_role') }}">
+      <div class="field">
+        <label>Назва</label>
+        <input type="text" name="name" required />
+      </div>
+      <div class="field">
+        <label>Опис</label>
+        <textarea name="description" rows="2"></textarea>
+      </div>
+      <div class="field">
+        <label><input type="checkbox" name="can_manage_all_listings" /> Може видаляти будь-які оголошення</label>
+      </div>
+      <div class="field">
+        <label><input type="checkbox" name="can_manage_roles" /> Керує ролями</label>
+      </div>
+      <button class="btn btn-success" type="submit">Додати роль</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

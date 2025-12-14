@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="card">
+  <h2>Активні оголошення</h2>
+  <div class="filters">
+    <form method="get" action="{{ url_for('index') }}" class="filters" style="width:100%">
+      <div style="flex:1 1 220px" class="field">
+        <label>Категорія</label>
+        <select name="category" onchange="this.form.submit()">
+          <option value="all">Усі</option>
+          {% for cat in categories %}
+          <option value="{{ cat }}" {% if request.args.get('category')==cat %}selected{% endif %}>{{ cat|capitalize }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div style="flex:1 1 220px" class="field">
+        <label>Сортування</label>
+        <select name="sort" onchange="this.form.submit()">
+          <option value="date_desc" {% if request.args.get('sort','date_desc')=='date_desc' %}selected{% endif %}>Найновіші</option>
+          <option value="date_asc" {% if request.args.get('sort')=='date_asc' %}selected{% endif %}>Найстаріші</option>
+          <option value="price_desc" {% if request.args.get('sort')=='price_desc' %}selected{% endif %}>Ціна ↓</option>
+          <option value="price_asc" {% if request.args.get('sort')=='price_asc' %}selected{% endif %}>Ціна ↑</option>
+        </select>
+      </div>
+    </form>
+  </div>
+  <div class="grid">
+    {% for listing in listings %}
+    <div class="card listing-card">
+      <div class="badge">{{ listing.category|capitalize }}</div>
+      <h3>{{ listing.title }}</h3>
+      <div class="price">{{ '%.2f'|format(listing.price) }} ₴</div>
+      <p>{{ listing.description }}</p>
+      <div class="meta">
+        <span>Discord: {{ listing.contact_discord }}</span>
+        <span>{{ listing.created_at.strftime('%d.%m.%Y') }}</span>
+      </div>
+      {% if current_user.is_authenticated and require_permission(listing) %}
+      <div class="actions" style="margin-top:10px">
+        <a class="btn" href="{{ url_for('edit_listing', listing_id=listing.id) }}">Редагувати</a>
+        <form method="post" action="{{ url_for('delete_listing', listing_id=listing.id) }}">
+          <button class="btn btn-danger" type="submit">Видалити</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+    {% else %}
+    <p>Немає оголошень у цій категорії.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
