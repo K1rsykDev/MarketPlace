@@ -19,7 +19,18 @@ DB_PATH = os.path.join(BASE_DIR, "marketplace.db")
 
 
 def create_app():
-    app = Flask(__name__, template_folder="docs")
+    """Build the Flask application with explicit template/static locations.
+
+    Using absolute paths prevents Jinja from failing to locate templates when
+    the app is launched from a different working directory (a common cause of
+    raw `{{ ... }}` blocks being rendered in the browser).
+    """
+    app = Flask(
+        __name__,
+        template_folder=os.path.join(BASE_DIR, "docs"),
+        static_folder=os.path.join(BASE_DIR, "static"),
+    )
+    app.config["TEMPLATES_AUTO_RELOAD"] = True
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-key")
     app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DB_PATH}"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
